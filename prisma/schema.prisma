@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "darwin-arm64", "debian-openssl-3.0.x"]
+  telemetry = false
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  passwordV3 String?   @map("password_v3") @db.VarChar(255)
+  username   String?   @unique @db.VarChar(255)
+  mobile     String?   @unique @db.VarChar(255)
+  gender     Gender?   @default(RANDOM)
+  address    String?   @db.VarChar(255)
+  image      String?   @db.VarChar(255)
+  role       Role?
+  birthDate  DateTime? @db.Date
+  createdAt  DateTime  @db.Date
+  firstName  String?   @db.VarChar(255)
+  lastName   String?   @db.VarChar(255)
+  updatedAt  DateTime  @db.Date
+}
+
+model Cars {
+  carId        Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  brand        Brand
+  image        String   @db.VarChar(200)
+  rentPrice    Int
+  yearReleased DateTime @db.Timestamp(6)
+  createdAt    DateTime @db.Date
+  updatedAt    DateTime @db.Date
+  isRent       Boolean  @default(false)
+  orderId      Int?
+  updatedBy    String?  @db.VarChar(100)
+  orders       Orders?  @relation(fields: [orderId], references: [orderId])
+}
+
+model Orders {
+  orderId   Int         @id @default(autoincrement())
+  status    OrderStatus
+  dayRent   Int
+  priceRent Int
+  car       Cars[]
+}
+
+enum Role {
+  ADMIN_USER
+  SUPER_USER
+  USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  RANDOM
+}
+
+enum Brand {
+  TOYOTA
+  HONDA
+  SUZUKI
+  MITSUBISHI
+}
+
+enum OrderStatus {
+  STILL_RENTING
+  FINISH_RENTING
+}
